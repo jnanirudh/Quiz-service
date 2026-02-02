@@ -9,11 +9,11 @@
     </parent>
     <groupId>com.example</groupId>
     <artifactId>Quiz-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>Quiz-service</name>
 
     <properties>
-        <java.version>17</java.version> <spring-cloud.version>2023.0.0</spring-cloud.version>
+        <java.version>25</java.version> <spring-cloud.version>2023.0.0</spring-cloud.version>
     </properties>
 
     <dependencies>

@@ -3,6 +3,7 @@ package com.example.quizservice.service;
 import com.example.quizservice.dao.QuizDao;
 import com.example.quizservice.feign.QuizInterface;
 import com.example.quizservice.model.QuestionWrapper;
+import com.example.quizservice.model.Response;
 import com.example.quizservice.model.Quiz;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,11 @@ public class QuizService {
     QuizInterface quizInterface;
 
     public ResponseEntity<String> createQuiz(String subject, Integer numQ, String title) {
-        // 1. Call Feign to get IDs from Question Service
-        List<Integer> questions = quizInterface.getQuestionsForQuiz(subject, numQ).getBody();
+        // Call Feign to get IDs from Question Service (Now calling /questions/generate)
+        ResponseEntity<List<Integer>> response = quizInterface.getQuestionsForQuiz(subject, numQ);
+        List<Integer> questions = response.getBody();
 
-        // 2. Create and Save the Quiz
+        // Create and Save the Quiz object in quiz_db
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
         quiz.setQuestionIds(questions);
@@ -34,13 +36,15 @@ public class QuizService {
     }
 
     public ResponseEntity<List<QuestionWrapper>> getQuizQuestions(Integer id) {
-        // 1. Get Quiz from our DB
-        Quiz quiz = quizDao.findById(id).get();
+        // Get the Quiz record from the local database
+        Quiz quiz = quizDao.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
         List<Integer> questionIds = quiz.getQuestionIds();
 
-        // 2. Call Feign to get the actual Question Wrappers (DTOs) from Question Service
-        ResponseEntity<List<QuestionWrapper>> questions = quizInterface.getQuestionsFromId(questionIds);
+        // Ask Question Service for the Wrappers (DTOs) for these IDs
+        return quizInterface.getQuestionsFromId(questionIds);
+    }
 
-        return questions;
+    public ResponseEntity<Integer> calculateScore(Integer id, List<Response> responses) {
+        return quizInterface.getScore(responses);
     }
 }
