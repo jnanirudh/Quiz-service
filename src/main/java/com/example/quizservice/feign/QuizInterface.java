@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
-@FeignClient(name = "QUESTION-SERVICE", url = "http://localhost:8081/question")
+@FeignClient(name = "QUESTION-SERVICE", url = "http://localhost:8081/questions")
 public interface QuizInterface {
 
     // Call Question Service to get IDs
