@@ -21,19 +21,23 @@ public class QuizService {
     @Autowired
     QuizInterface quizInterface;
 
+
     public ResponseEntity<String> createQuiz(String subject, Integer numQ, String title) {
-        // Call Feign to get IDs from Question Service (Now calling /questions/generate)
         ResponseEntity<List<Integer>> response = quizInterface.getQuestionsForQuiz(subject, numQ);
         List<Integer> questions = response.getBody();
 
-        // Create and Save the Quiz object in quiz_db
+        if (questions == null || questions.isEmpty()) {
+            return new ResponseEntity<>("No questions found for subject: " + subject, HttpStatus.BAD_REQUEST);
+        }
+
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
         quiz.setQuestionIds(questions);
-        quizDao.save(quiz);
 
-        return new ResponseEntity<>("Quiz Created Successfully", HttpStatus.CREATED);
+        Quiz savedQuiz = quizDao.save(quiz);
+        return new ResponseEntity<>("Quiz Created Successfully. Quiz ID: " + savedQuiz.getId(), HttpStatus.CREATED);
     }
+
 
     public ResponseEntity<List<QuestionWrapper>> getQuizQuestions(Integer id) {
         // Get the Quiz record from the local database

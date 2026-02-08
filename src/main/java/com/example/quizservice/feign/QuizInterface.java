@@ -13,7 +13,7 @@ import java.util.List;
 @FeignClient(name = "QUESTION-SERVICE", url = "http://localhost:8081/questions")
 public interface QuizInterface {
 
-    // Call Question Service to get IDs
+// Call question-service to get ID's
     @GetMapping("generate")
     public ResponseEntity<List<Integer>> getQuestionsForQuiz(
             @RequestParam String subject, @RequestParam Integer numQ);
